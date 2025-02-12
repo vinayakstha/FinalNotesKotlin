@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "113547776752",
+    "firebase_url": "https://finalnotesapp-56a32-default-rtdb.firebaseio.com",
+    "project_id": "finalnotesapp-56a32",
+    "storage_bucket": "finalnotesapp-56a32.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113547776752:android:2706374d63cc1f78906835",
+        "android_client_info": {
+          "package_name": "com.example.finalnotesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnoBH-42-PU8iFI_KM5Bs-300N6D285mk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
