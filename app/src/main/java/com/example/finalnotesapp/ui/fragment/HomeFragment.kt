@@ -17,7 +17,6 @@ import com.example.finalnotesapp.repository.NotesRepositoryImpl
 import com.example.finalnotesapp.ui.activity.AddNotesActivity
 import com.example.finalnotesapp.viewmodel.NotesViewModel
 
-
 class HomeFragment : Fragment() {
 
     lateinit var binding: FragmentHomeBinding
