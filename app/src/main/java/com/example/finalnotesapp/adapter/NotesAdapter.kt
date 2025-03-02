@@ -71,7 +71,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.finalnotesapp.R
 import com.example.finalnotesapp.model.NotesModel
 import com.example.finalnotesapp.ui.activity.UpdateNotesActivity
-import com.example.finalnotesapp.utils.FavouritesManager  // CHANGED: Import FavouritesManager
+import com.example.finalnotesapp.utils.FavouritesManager
 
 class NotesAdapter(
     var context: Context,
@@ -83,7 +83,7 @@ class NotesAdapter(
         val noteName: TextView = itemView.findViewById(R.id.displayTask)
         val noteDate: TextView = itemView.findViewById(R.id.date)
         val noteDesc: TextView = itemView.findViewById(R.id.desc)
-        val favoriteButton: ImageButton = itemView.findViewById(R.id.favoriteButton)  // CHANGED: Reference to favourite button
+        val favoriteButton: ImageButton = itemView.findViewById(R.id.favoriteButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
@@ -97,16 +97,16 @@ class NotesAdapter(
         holder.noteDate.text = note.notesDate
         holder.noteDesc.text = note.notesDescription
 
-        // Existing update functionality remains unchanged
+
         holder.update.setOnClickListener {
             val intent = Intent(context, UpdateNotesActivity::class.java)
             intent.putExtra("notesId", note.notesId)
             context.startActivity(intent)
         }
 
-        // CHANGED: Set onClickListener for the favourite button.
+
         holder.favoriteButton.setOnClickListener {
-            // Check if the note is already in favourites
+
             if (!FavouritesManager.favouritesList.contains(note)) {
                 FavouritesManager.favouritesList.add(note)
                 Toast.makeText(context, "Added to Favourites", Toast.LENGTH_SHORT).show()

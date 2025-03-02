@@ -1,60 +1,118 @@
 package com.example.finalnotesapp.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
 import com.example.finalnotesapp.R
+import com.example.finalnotesapp.repository.UserRepositoryImpl
+import com.example.finalnotesapp.ui.activity.LoginActivity
+import com.google.firebase.auth.FirebaseAuth
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class ProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var auth: FirebaseAuth
+    private lateinit var userRepository: UserRepositoryImpl
+    private lateinit var currentEmailTextView: TextView
+    private lateinit var currentUsernameTextView: TextView
+    private lateinit var logoutCardView: CardView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
-    }
+        // Inflate the layout (ensure the file name matches your XML file, here it's fragment_profile2.xml)
+        val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        auth = FirebaseAuth.getInstance()
+        userRepository = UserRepositoryImpl()
+
+        // Bind UI components from the XML
+        currentEmailTextView = view.findViewById(R.id.currentEmailTextView)
+        currentUsernameTextView = view.findViewById(R.id.currentUsernameTextView)
+
+        logoutCardView = view.findViewById(R.id.logout)
+
+        // Display the currently logged in user's email and username directly from FirebaseAuth and Database
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            currentEmailTextView.text = "Email : ${currentUser.email}"
+            userRepository.getUserData(currentUser.uid) { userModel ->
+                if (userModel != null) {
+                    currentUsernameTextView.text = "Username : ${userModel.username}"
+                } else {
+                    currentUsernameTextView.text = "Current Username: N/A"
                 }
             }
+        } else {
+            currentEmailTextView.text = "Not logged in"
+            currentUsernameTextView.text = "Username : N/A"
+        }
+
+        // Set click listener for logout
+        logoutCardView.setOnClickListener {
+            logout()
+        }
+        return view
+    }
+
+    /**
+     * Updates the user's email and username in Firebase Auth and then updates the corresponding
+     * record in the Firebase Realtime Database.
+     */
+    private fun updateCredentials(newEmail: String, newUsername: String) {
+        val user = auth.currentUser
+        if (user == null) {
+            Toast.makeText(requireContext(), "User not authenticated", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Update email in Firebase Auth
+        user.updateEmail(newEmail)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(requireContext(), "Email updated successfully", Toast.LENGTH_SHORT).show()
+                    // Update UI to reflect the new email
+                    currentEmailTextView.text = "Current Email: $newEmail"
+
+                    // Update username and email in Firebase Realtime Database
+                    userRepository.getUserData(user.uid) { userModel ->
+                        if (userModel != null) {
+                            userModel.email = newEmail
+                            userModel.username = newUsername
+                            userRepository.updateUserData(user.uid, userModel) { success, message ->
+                                if (success) {
+                                    Toast.makeText(requireContext(), "User data updated successfully", Toast.LENGTH_SHORT).show()
+                                    currentUsernameTextView.text = "Current Username: $newUsername"
+                                } else {
+                                    Toast.makeText(requireContext(), "DB update failed: $message", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Failed to update email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    /**
+     * Logs out the user and navigates back to the LoginActivity.
+     */
+    private fun logout() {
+        auth.signOut()
+        val intent = Intent(activity, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        activity?.finish()
     }
 }

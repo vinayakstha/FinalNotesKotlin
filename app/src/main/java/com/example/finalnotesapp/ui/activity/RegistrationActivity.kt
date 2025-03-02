@@ -1,5 +1,6 @@
 package com.example.finalnotesapp.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -48,6 +49,9 @@ class RegistrationActivity : AppCompatActivity() {
                                 message,
                                 Toast.LENGTH_SHORT
                             ).show()
+                            val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
+                            startActivity(intent)
+                            finish()
 
                         }else{
                             loadingUtils.dismiss()

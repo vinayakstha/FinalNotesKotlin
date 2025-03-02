@@ -25,7 +25,7 @@
         android:id="@+id/subtextnotes"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="With only few steps create your personal notes."
+        android:text="Update Notes."
         android:textSize="14sp"
         android:fontFamily="@font/comfortaaregular"
         app:layout_constraintTop_toBottomOf="@+id/createnotestext"
